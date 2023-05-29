@@ -42,18 +42,20 @@ class IndexManager:
     @staticmethod
     def delete(index,key):
         tableName = index.tableName
-        attributeName = index,attributeName
+        attributeName = index.attributeName
         type = CatalogManager.getAttributeType(tableName,attributeName).type
-
+        # print(type)
         if type == "INT":
             intTree = IndexManager.intTreeMap.get(index.indexName)
-            intTree.delete(key)
+            intTree.deleteKey(key)
         elif type == "FLOAT":
             floatTree = IndexManager.floatTreeMap.get(index.indexName)
-            floatTree.delete(key)
+            floatTree.deleteKey(key)
         elif type == "CHAR":
             charTree = IndexManager.charTreeMap.get(index.indexName)
-            charTree.delete(key)
+            charTree.deleteKey(key)
+        else:
+            print("Unknown delete type")
                 
 
 
@@ -63,7 +65,7 @@ class IndexManager:
         tableName = index.tableName
         attributeName = index.attributeName
         type = CatalogManager.getAttributeType(tableName, attributeName).type
-        
+        print("inserting",key,value)
         if type == "INT":
             intTree = IndexManager.intTreeMap.get(index.indexName)
             intTree.insert(key,value)
@@ -116,10 +118,11 @@ class IndexManager:
     @staticmethod
     def dropIndex(idx : Index):
         fileName = idx.indexName
+        attributeName = idx.attributeName
         if os.path.exists(fileName):
             os.remove(fileName)
-        index = CatalogManager.getAttributeIndex(idx.tableName, idx.attributeName)
-        type = CatalogManager.getAttributeType(idx.tableName, index)
+        type = CatalogManager.getAttributeType(idx.tableName, attributeName).type
+        # print("type: " + type)
         if type == "INT":
             IndexManager.intTreeMap.pop(idx.indexName)
         elif type == "CHAR":

@@ -204,6 +204,8 @@ class CatalogManager:
             for index in table.index:
                   if index.attributeName == attributeName:
                         return index.indexName
+            
+            # print(333,attributeName )
                 
             return None 
       
@@ -242,19 +244,6 @@ class CatalogManager:
             print("The attribute " + attributeName + " doesn't exist")
             return None
       
-      @staticmethod
-      def getLength (tableName,attributeName):
-            if not tableName in CatalogManager.tables:
-                  print("The table " + tableName + " doesn't exist")
-                  return None
-            
-            table= CatalogManager.tables[tableName]
-            for i,a in enumerate(table.attributes):
-                 if a.attributeName == attributeName:
-                       return a.type.getLength()
-            print("The attribute " + attributeName + " doesn't exist")
-            return -1
-
 
       @staticmethod
       def getType(tableName,i):
@@ -271,7 +260,15 @@ class CatalogManager:
                   return None
             
             return CatalogManager.tables[tableName].attributes[i].type.getLength()
-      
+
+      @staticmethod
+      def addRowNum(tableName):
+            CatalogManager.tables[tableName].rowNum+=1
+            
+      @staticmethod
+      def deleteRowNum(tableName, num):
+            CatalogManager.tables[tableName].rowNum-=num
+            
       @staticmethod
       def createTable(table):
             CatalogManager.tables[table.tableName]=table 

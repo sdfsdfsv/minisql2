@@ -13,7 +13,7 @@ class Condition:
 		lhs = row.getAttributeValue(index)
   
 		rhs = self.value
-		print(rhs,lhs,self.operator)
+		# print(rhs,lhs,self.operator)
 		if self.operator == "=":
 			return lhs == rhs
 		elif self.operator == "<>" or self.operator == "!=":

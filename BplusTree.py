@@ -66,6 +66,8 @@ class BplusTree:
                     current_node = current_node.keys[i + 1]
                     break
         return current_node
+    
+    
 
     def find(self, value, key):
         l = self.search(value)
@@ -113,6 +115,60 @@ class BplusTree:
                         j.parent = parentdash
                     self.insert_in_parent(parentNode, value_, parentdash)
 
+    def deleteKey(self, value):
+        value = str(value)
+        leaf_node = self.search(value)
+        if not self.find(value, None):
+            return False
+
+        # 找到要删除的key在叶节点中的位置
+        index = None
+        for i, item in enumerate(leaf_node.values):
+            if item == value:
+                index = i
+                break
+
+        # 删除key
+        leaf_node.values.pop(index)
+        leaf_node.keys.pop(index)
+
+        # 如果叶节点的key数小于order/2，则需要合并或者借key
+        if len(leaf_node.values) < leaf_node.order // 2:
+            # 如果左兄弟节点有多余的key，则从左兄弟节点借一个key
+            if leaf_node.parent and leaf_node.parent.keys.index(leaf_node) > 0:
+                left_sibling = leaf_node.parent.keys[leaf_node.parent.keys.index(leaf_node) - 1]
+                if len(left_sibling.values) > left_sibling.order // 2:
+                    leaf_node.values.insert(0, left_sibling.values.pop())
+                    leaf_node.keys.insert(0, left_sibling.keys.pop())
+                    return True
+
+            # 如果右兄弟节点有多余的key，则从右兄弟节点借一个key
+            if leaf_node.parent and leaf_node.parent.keys.index(leaf_node) < len(leaf_node.parent.keys) - 1:
+                right_sibling = leaf_node.parent.keys[leaf_node.parent.keys.index(leaf_node) + 1]
+                if len(right_sibling.values) > right_sibling.order // 2:
+                    leaf_node.values.append(right_sibling.values.pop(0))
+                    leaf_node.keys.append(right_sibling.keys.pop(0))
+                    return True
+
+            # 如果左右兄弟节点都没有多余的key，则需要合并
+            if leaf_node.parent:
+                index = leaf_node.parent.keys.index(leaf_node)
+                if index > 0:
+                    left_sibling = leaf_node.parent.keys[index - 1]
+                    left_sibling.values += leaf_node.values
+                    left_sibling.keys += leaf_node.keys
+                    leaf_node.parent.keys.pop(index)
+                    leaf_node.parent.values.pop(index - 1)
+                    leaf_node.parent.keys[index - 1].nextKey = leaf_node.nextKey
+                else:
+                    right_sibling = leaf_node.parent.keys[index + 1]
+                    leaf_node.values += right_sibling.values
+                    leaf_node.keys += right_sibling.keys
+                    leaf_node.nextKey = right_sibling.nextKey
+                    leaf_node.parent.keys.pop(index)
+                    leaf_node.parent.values.pop(index)
+        return True
+    
     def delete(self, value, key):
         node_ = self.search(value)
 
@@ -279,7 +335,6 @@ class BplusTree:
         for i, item in enumerate(current_node.values):
             if item == value:
                 result.append((item, current_node.keys[i]))
-
         return result
 
     def findGreater(self, value):

@@ -72,6 +72,7 @@ class RecordManager:
 
         if headBlock is None:
             Exception("Can't get block from buffer")
+            # print(114514)
         if not RecordManager.checkRow(tableName, row):
             return None
 
@@ -101,8 +102,9 @@ class RecordManager:
         return Address(tableName, blockOffset, byteOffset)
 
     @staticmethod
-    def delete(tableName, conditions):
-        tupleNum = CatalogManager.getRowNum(tableName)
+    def delete(tableName:str, conditions:list[Condition])->int:
+        rowNum = CatalogManager.getRowNum(tableName)
+        # print("rowNum: ", rowNum)
         storeLen = RecordManager.getStoreLength(tableName)
 
         processNum = 0
@@ -114,39 +116,48 @@ class RecordManager:
         laterBlock = headBlock
 
         if headBlock is None:
-            Exception("Can't get block from buffer")
+            print(Exception("Can't get block from buffer"))
         if not RecordManager.checkCondition(tableName, conditions):
+            print("Check condition false" + conditions)
             return 0
 
         headBlock.isLocked = True
 
-        for currentNum in range(0, tupleNum):
+        for currentNum in range(0, rowNum):
+            
             if byteOffset + storeLen >= Block.BLOCKSIZE:
                 blockOffset += 1
                 byteOffset = 0
                 laterBlock = BufferManager.readBlockFromDiskQuote(tableName, blockOffset)
                 if laterBlock is None:
                     headBlock.isLocked = False
+                    print("headBlock lokced")
                     return deleteNum
+            # print(currentNum) 
             if laterBlock.readInteger(byteOffset) < 0:
                 newRow = RecordManager.getTuple(
                     tableName, laterBlock, byteOffset)
+                # print(newRow)
                 if all([condition.satisfy(tableName, newRow) for condition in conditions]):
                     laterBlock.writeInteger(byteOffset, 0)
-                    laterBlock.writeInteger(
-                        byteOffset + 1, headBlock.readInteger(0))
+                    laterBlock.writeInteger(byteOffset + 1, headBlock.readInteger(0))
                     headBlock.writeInteger(0, currentNum)
+                    print("write new")
                     deleteNum += 1
-                    for j in range(0, newRow.getAttributeSize()):
-                        attrName = CatalogManager.getAttributeName(
-                            tableName, j)
+                    for i in range(0, newRow.getAttributeSize()):
+                        attrName = CatalogManager.getAttributeName(tableName, i)
+                        print("delete new attribute",attrName, currentNum)
                         if CatalogManager.isIndexKey(tableName, attrName):
-                            indexName = CatalogManager.getIndexName(
-                                tableName, attrName)
+                            indexName = CatalogManager.getIndexName( tableName, attrName)
                             index = CatalogManager.getIndex(indexName)
-                            IndexManager.delete(
-                                index, newRow.getAttributeValue(j))
+                            # print("delete index",index,newRow.getAttributeValue(i))
+                            try:
+                                IndexManager.delete(index, newRow.getAttributeValue(i))
+                            except Exception:
+                                print(Exception)
+                           
                 processNum += 1
+                print("processnum",processNum)
             byteOffset += storeLen
 
         headBlock.isLocked = False
@@ -207,7 +218,7 @@ class RecordManager:
 
         head_block.isLocked(True)
         delete_num = 0
-
+        print("Deleting")
         for i in range(len(addresses)):
             block_offset = addresses[i].blockOffset
             byte_offset = addresses[i].byteOffset
@@ -235,11 +246,9 @@ class RecordManager:
                         attr_name = CatalogManager.getAttributeName(
                             tableName, k)
                         if CatalogManager.isIndexKey(tableName, attr_name):
-                            index_name = CatalogManager.getIndexName(
-                                tableName, attr_name)
+                            index_name = CatalogManager.getIndexName(tableName, attr_name)
                             index = CatalogManager.getIndex(index_name)
-                            IndexManager.delete(
-                                index, newRow.getAttributeValue(k))
+                            IndexManager.delete(index, newRow.getAttributeValue(k))
 
             block_offset_pre = block_offset
 
