@@ -130,7 +130,7 @@ class Api:
                 print(Exception(str(e)))
             except Exception:
                 print(Exception("Failed to delete from table " + tableName))
-        print("Number of records", numberOfRecords)
+        # print("Number of records", numberOfRecords)
         CatalogManager.deleteRowNum(tableName, numberOfRecords)
         return numberOfRecords
 
@@ -206,18 +206,18 @@ if __name__ == "__main__":
 
     print(t1)
 
-    res=Api.select("students",["id","name","category"],[Condition("name",">","ljx")])
+    res=Api.select("students",["id","name","category"],[Condition("id",">","3")])
     print([str(r) for r in res])
     
     res=Api.select("students",["name"],[])
     print([str(r) for r in res])
     
-    res=Api.deleteRow("students",[Condition("name","==","ljx1")])
-    
-    Api.dropTable("students")
+    res=Api.deleteRow("students",[Condition("id",">","1")])
     
     res=Api.select("students",["id","name","category"],[])
     print([str(r) for r in res])
     
+    
+    Api.dropTable("students")
     
     

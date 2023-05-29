@@ -65,7 +65,7 @@ class IndexManager:
         tableName = index.tableName
         attributeName = index.attributeName
         type = CatalogManager.getAttributeType(tableName, attributeName).type
-        print("inserting",key,value)
+        # print("inserting",key,value)
         if type == "INT":
             intTree = IndexManager.intTreeMap.get(index.indexName)
             intTree.insert(key,value)
