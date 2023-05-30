@@ -193,6 +193,7 @@ if __name__ == "__main__":
     idd = Attribute('id', 'INT', 4, True)
     name = Attribute('name', 'CHAR', 12)
     cat = Attribute('category', 'CHAR', 20)
+    
     attributes = [idd, name, cat]
     t1 = Table("students", "id", attributes)
     
@@ -201,7 +202,7 @@ if __name__ == "__main__":
     # print(t1)
 
     for i in range(0,10):
-        Api.insertRow("students", TableRow([i, f'ljx{i}', f'{i}man']))
+        Api.insertRow("students", TableRow([1, f'ljx{i}', f'{i}man']))
         # Api.store()
 
     print(t1)
@@ -217,7 +218,11 @@ if __name__ == "__main__":
     res=Api.select("students",["id","name","category"],[])
     print([str(r) for r in res])
     
+    Api.store()
     
     Api.dropTable("students")
     
+    res=Api.select("students",["id","name","category"],[])
+    print([str(r) for r in res])
     
+    Api.store()

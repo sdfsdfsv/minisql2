@@ -236,7 +236,7 @@ class RecordManager:
             if delete_block.readInteger(byte_offset) < 0:
                 newRow = RecordManager.getTuple(
                     tableName, delete_block, byte_offset)
-                print(newRow)
+                # print(newRow)
                 if all([condition.satisfy(tableName, newRow) for condition in conditions]):
                     delete_block.writeInteger(byte_offset, 0)
                     delete_block.writeInteger(
