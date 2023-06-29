@@ -55,6 +55,17 @@ def drop_table():
     return jsonify({'message': f'Table {table_name}  dropped successfully'})
 
 
+@app.route('/store', methods=['POST'])
+def store(): 
+    api.store()
+    return jsonify({'message': f'Tables stored successfully'})
+
+
+@app.route('/init', methods=['POST'])
+def init(): 
+    api.init()
+    return jsonify({'message': f'Api init successfully'})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    Api.init()
+    app.run(debug=True,port=5000)
